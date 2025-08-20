@@ -33,6 +33,7 @@ type LocationAreaResponse struct {
 	
 func main () {
 
+	var config Config
 	scanner := bufio.NewScanner(os.Stdin)
 	cliMap := map[string]cliCommand {
 		"exit" : {
@@ -43,7 +44,9 @@ func main () {
 		"map" : {
 			Name : "Map", 
 			Description: "Displays next 20 locations",
-			Calllback: commandMap,
+			Callback: func() error {
+				return commandMap(&config)
+			},
 		},
 	}
 	cliMap["help"] = cliCommand{
@@ -78,7 +81,7 @@ func commandExit() error {
 }
 
 
-func getData(url string) (*ApiResponse, errro ) {
+func getLocations(url string) ( *LocationAreaResponse, error ) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -91,13 +94,28 @@ func getData(url string) (*ApiResponse, errro ) {
 		return nil, err
 	}
 
-	return res, nil
-}
-func getLocations() error {
-	url := "https://pokeapi.co/api/v2/location-area/?offset=20&limit=20"
-	
+	return &res, nil
 }
 
+func commandMap(conf *Config) error {
+	if conf.Next == nil {
+		defaultURL := "https://pokeapi.co/api/v2/location-area?offset=0&limit=20"
+		conf.Next = &defaultURL
+	}
+	locations,err := getLocations(*conf.Next)
+
+	if err != nil {
+		return  err
+	}
+	
+	for _, loc := range locations.Results {
+		fmt.Println(loc.Name)
+	}
+
+	conf.Next = locations.Next
+
+	return nil
+}
 
 func commandHelp(commands map[string]cliCommand) error {
 	fmt.Printf("Welcome to the Pokedex!\nUsage: \n\n" )
