@@ -48,6 +48,13 @@ func main () {
 				return commandMap(&config)
 			},
 		},
+		"mapb" : {
+			Name: "Mapb",
+			Description: "Displays previous 20 locations",
+			Callback: func() error {
+				return commandMapb(&config)
+			} ,
+		},
 	}
 	cliMap["help"] = cliCommand{
 			Name: "Help",
@@ -113,10 +120,29 @@ func commandMap(conf *Config) error {
 	}
 
 	conf.Next = locations.Next
+	conf.Previous = locations.Previous
 
 	return nil
 }
 
+func commandMapb(conf *Config) error {
+	if conf.Previous == nil	 {
+		fmt.Printf("You're on the first page")
+		return nil
+	}
+	locations, err := getLocations(*conf.Previous)
+
+	if err != nil {
+		return err
+	}
+	for _, loc := range locations.Results {
+		fmt.Println(loc.Name)
+	}
+	conf.Next = locations.Next
+	conf.Previous = locations.Previous
+	return nil
+		
+}
 func commandHelp(commands map[string]cliCommand) error {
 	fmt.Printf("Welcome to the Pokedex!\nUsage: \n\n" )
 	for name, cmd := range commands {
