@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"github.com/anton-jj/pokedex-cli/internal/pokecache"
 )
 type cliCommand struct {
 	Name string
