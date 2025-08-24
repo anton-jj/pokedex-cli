@@ -1,4 +1,4 @@
-package internal
+package pokecache
 
 import (
 	"testing"
@@ -19,6 +19,10 @@ func TestAddGet(t *testing.T) {
 		{
 			key: "https://example.com/path",
 			val: []byte("moretestdata"),
+		},
+		{
+			key : "https://something.com/path",
+			val : []byte("this is the data"),
 		},
 	}
 
